@@ -31,6 +31,7 @@ app.use('/api/admin/universities', require('./routes/universityRoutes'));
 app.use('/api/admin/programs', require('./routes/programRoutes'));
 app.use('/api/admin/enquiries', require('./routes/enquiryRoutes'));
 app.use('/api/public', require('./routes/publicRoutes'));
+app.use('/api/setup', require('./routes/setupRoute')); // TEMPORARY
 
 // Health check route
 app.get('/', (req, res) => {
