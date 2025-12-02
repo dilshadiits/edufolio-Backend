@@ -9,47 +9,86 @@ const UniversitySchema = new mongoose.Schema({
     },
     slug: {
         type: String,
-        unique: true
+        unique: true,
+        lowercase: true
     },
     shortName: {
         type: String,
         trim: true
     },
+    type: {
+        type: String,
+        enum: ['Private', 'Government', 'Deemed', 'State', 'Central', 'Autonomous'],
+        default: 'Private'
+    },
     logo: {
         type: String,
         default: ''
     },
+    bannerImage: {
+        type: String,
+        default: ''
+    },
+    // Keep 'banner' as alias for backward compatibility
     banner: {
         type: String,
         default: ''
     },
     description: {
         type: String,
-        required: [true, 'Description is required']
+        default: ''
     },
     establishedYear: {
         type: Number
     },
+    // Location fields
+    city: {
+        type: String,
+        trim: true
+    },
+    state: {
+        type: String,
+        trim: true
+    },
     location: {
         type: String,
-        required: [true, 'Location is required']
+        trim: true
     },
     address: {
-        type: String
+        type: String,
+        trim: true
     },
+    // Contact
     website: {
-        type: String
+        type: String,
+        trim: true
     },
     email: {
-        type: String
+        type: String,
+        trim: true,
+        lowercase: true
     },
     phone: {
-        type: String
+        type: String,
+        trim: true
     },
+    // Ratings & Approvals
     rating: {
         type: String,
-        enum: ['A++', 'A+', 'A', 'B++', 'B+', 'B', 'C', 'Not Rated'],
-        default: 'Not Rated'
+        default: ''
+    },
+    naacGrade: {
+        type: String,
+        enum: ['', 'A++', 'A+', 'A', 'B++', 'B+', 'B', 'C', 'Not Rated'],
+        default: ''
+    },
+    ugcApproved: {
+        type: Boolean,
+        default: true
+    },
+    aicteApproved: {
+        type: Boolean,
+        default: false
     },
     accreditations: {
         type: [String],
@@ -59,6 +98,7 @@ const UniversitySchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    // Features
     facilities: {
         type: [String],
         default: []
@@ -67,6 +107,7 @@ const UniversitySchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    // Fee
     minFee: {
         type: Number,
         default: 0
@@ -75,6 +116,7 @@ const UniversitySchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    // Status
     featured: {
         type: Boolean,
         default: false
@@ -100,14 +142,27 @@ UniversitySchema.virtual('programs', {
     count: true
 });
 
-// Auto-generate slug before saving
+// Auto-generate slug before saving (only if not provided)
 UniversitySchema.pre('save', function(next) {
-    if (this.isModified('name') || !this.slug) {
+    if (!this.slug && this.name) {
         this.slug = slugify(this.name, {
             lower: true,
             strict: true
         });
     }
+    
+    // Sync bannerImage and banner fields
+    if (this.bannerImage && !this.banner) {
+        this.banner = this.bannerImage;
+    } else if (this.banner && !this.bannerImage) {
+        this.bannerImage = this.banner;
+    }
+    
+    // Build location from city and state if not provided
+    if (!this.location && this.city) {
+        this.location = this.state ? `${this.city}, ${this.state}` : this.city;
+    }
+    
     next();
 });
 
@@ -116,5 +171,6 @@ UniversitySchema.index({ name: 'text', location: 'text', description: 'text' });
 UniversitySchema.index({ slug: 1 });
 UniversitySchema.index({ featured: 1 });
 UniversitySchema.index({ isActive: 1 });
+UniversitySchema.index({ city: 1 });
 
 module.exports = mongoose.model('University', UniversitySchema);
