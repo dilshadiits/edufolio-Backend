@@ -30,9 +30,10 @@ const EnquirySchema = new mongoose.Schema({
         ref: 'University'
     },
     source: {
-        type: String,
-        enum: ['Website', 'Landing Page', 'Contact Form', 'Program Page', 'University Page', 'Other'],
-        default: 'Website'
+    type: String,
+    enum: ['Website', 'Landing Page', 'Contact Form', 'Program Page', 'University Page', 'Enrollment Form', 'Other'],  // 👈 Added here
+    default: 'Website'
+},
     },
     status: {
         type: String,
