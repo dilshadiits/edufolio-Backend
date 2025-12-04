@@ -34,7 +34,7 @@ const EnquirySchema = new mongoose.Schema({
     enum: ['Website', 'Landing Page', 'Contact Form', 'Program Page', 'University Page', 'Enrollment Form', 'Other'],  // 👈 Added here
     default: 'Website'
 },
-    },
+
     status: {
         type: String,
         enum: ['New', 'Contacted', 'Interested', 'Not Interested', 'Converted', 'Closed'],
